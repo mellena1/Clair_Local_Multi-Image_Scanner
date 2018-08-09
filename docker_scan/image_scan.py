@@ -75,6 +75,10 @@ class ImageScan:
             layer_name = layer['Name']
             t = PrettyTable(headers)  # The table for this layer
 
+            # Make sure the layer has features
+            if 'Features' not in layer:
+                layers_to_write[layer_name] = t
+                continue
             # Make feature objects for this layer
             feature_objs = []
             for feature in layer['Features']:
