@@ -40,3 +40,7 @@ to take the Clair server and the DB back down.
 You must also have the dependencies listed in `requirements.txt` installed. You can easily do this with
 
 `pip install -r requirements.txt`
+
+## Current Limitations
+* Currently, the Clair server must be running locally because of how the images are checked. The images are saved locally in the tmp folder using `docker save` command, and then Clair is told to scan the image at that temporary location. Being able to use a remote Clair server would definitely be nicer.
+* Because of having to save the images locally in tar files, the script takes a little bit to run with larger images. Being able to check if an image is publically available and passing that to Clair would definitely make it more ideal.
