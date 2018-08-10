@@ -43,3 +43,11 @@ class DockerHelper:
             return self.docker_cli.images.get(image_id)
         except:
             return self.docker_cli.images.pull(image_id)
+
+    def ping(self):
+        """
+        ping
+
+        Check to see if the docker server is responsive
+        """
+        self.docker_cli.ping()

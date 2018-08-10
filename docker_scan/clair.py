@@ -167,3 +167,15 @@ class Clair:
             logging.error('Could not get info on layer '+layer_id)
             return None
         return r.json()
+
+    def ping(self):
+        """
+        ping
+
+        Ping the clair host to see if it is alive
+
+        :raises: Exception if ping fails
+        """
+        r = requests.get(self.cfg['clair.host']+'/v1/namespaces')
+        if r.status_code != 200:
+            raise Exception()

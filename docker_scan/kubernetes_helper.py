@@ -22,3 +22,15 @@ def get_pod_images(docker_helper):
             image_id = container.image
             images.append(docker_helper.get_image_obj_from_id(image_id))
     return images
+
+
+def ping():
+    """
+    ping
+
+    ping the k8s cluster to make sure it is alive
+    """
+    try:
+        v1.list_namespace()
+    except:
+        raise Exception()

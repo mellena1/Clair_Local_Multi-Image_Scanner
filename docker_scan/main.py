@@ -28,7 +28,19 @@ def main():
 
     # Make objs to help with retrieving info
     docker_helper = DockerHelper(cfg['docker.connect'])
+    try:
+        docker_helper.ping()
+    except:
+        print('Failed to connect to the docker'
+              ' server specified ({}).'.format(cfg['docker.connect']))
+        return 1
     clair_obj = Clair(cfg, docker_helper.docker_cli)
+    try:
+        clair_obj.ping()
+    except:
+        print('Failed to connect to the clair'
+              ' server specified ({}).'.format(cfg['clair.host']))
+        return 1
 
     # Source of images
     if args.source == 'docker':
@@ -36,8 +48,19 @@ def main():
             images = docker_helper.get_container_images()
         else:
             docker_server = DockerHelper(args.docker_server)
+            try:
+                docker_server.ping()
+            except:
+                print('Failed to connect to the docker'
+                      ' server specified ({}).'.format(args.docker_server))
+                return 1
             images = docker_server.get_container_images()
     elif args.source == 'k8s' or args.source == 'kubernetes':
+        try:
+            kubernetes_helper.ping()
+        except:
+            print('\nFailed to connect to kubernetes cluster.')
+            return 1
         images = kubernetes_helper.get_pod_images(docker_helper)
     elif args.source == 'file':
         # If specifying file, make sure it exists
