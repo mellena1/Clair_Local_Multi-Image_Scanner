@@ -1,7 +1,25 @@
-# Taken a lot from https://bitbucket.org/osallou/clair.git
+# Used https://bitbucket.org/osallou/clair.git as a base.
 # That package was written for Python 2, and it uses a different docker
 # library than I wanted to use. I also added some optimizations to what
-# that library was doing
+# that library was doing. The parts I kept from the old code were the API
+# calls, and the general flow of taking a docker image and saving it,
+# untarring it, and then using the manifest to create a layers list
+
+# License for this file
+# All code is under Apache 2.0 or more.
+# Copyright 2015 Olivier Sallou <olivier.sallou@irisa.fr>
+# .
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+# .
+# http://www.apache.org/licenses/LICENSE-2.0
+# .
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
 
 import os
 import logging
