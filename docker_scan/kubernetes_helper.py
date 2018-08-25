@@ -1,36 +1,49 @@
 from kubernetes import client, config
 
 
-config.load_kube_config()
-v1 = client.CoreV1Api()
-
-
-def get_pod_images(docker_helper):
+class KubernetesHelper:
     """
-    get_pod_images
+    KubernetesHelper
 
-    Get all pod images
-
-    :param docker_helper docker_helper.DockerHelper: The docker_helper obj to
-        use for getting Docker.Image objects from.
-    :return: The list of docker.Image objects
+    A class to hold a kubernetes connection object
     """
-    images = []
-    ret = v1.list_pod_for_all_namespaces(watch=False)
-    for i in ret.items:
-        for container in i.status.container_statuses:
-            image_id = container.image
-            images.append(docker_helper.get_image_obj_from_id(image_id))
-    return images
+    def __init__(self):
+        """
+        Creates a KubernetesHelper object. Will raise an exception if reading
+        the kubernters config file fails.
+        """
+        try:
+            config.load_kube_config()
+        except Exception as ex:
+            print(ex)
+            print(('Error loading kubernetes config. Please verify'
+                   ' that it is setup correctly.'))
+            raise ex
+        self.v1 = client.CoreV1Api()
+        self.host = self.v1.api_client.configuration.host
 
+    def get_pod_images(self, docker_helper):
+        """
+        get_pod_images
 
-def ping():
-    """
-    ping
+        Get all pod images
 
-    ping the k8s cluster to make sure it is alive
-    """
-    try:
-        v1.list_namespace()
-    except:
-        raise Exception()
+        :param docker_helper docker_helper.DockerHelper: The docker_helper obj
+            to use for getting Docker Image objects from.
+        :return: The list of docker.Image objects
+        """
+        images = []
+        ret = self.v1.list_pod_for_all_namespaces(watch=False)
+        for i in ret.items:
+            for container in i.status.container_statuses:
+                image_id = container.image
+                images.append(docker_helper.get_image_obj_from_id(image_id))
+        return images
+
+    def ping(self):
+        """
+        ping
+
+        ping the k8s cluster to make sure it is alive
+        """
+        self.v1.list_namespace()

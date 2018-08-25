@@ -41,7 +41,7 @@ class DockerHelper:
         """
         try:
             return self.docker_cli.images.get(image_id)
-        except:
+        except Exception:
             return self.docker_cli.images.pull(image_id)
 
     def ping(self):

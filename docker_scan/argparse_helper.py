@@ -44,7 +44,7 @@ def file_parser(subparsers):
                     'file',
                     description=('Security check images from a list of images')
     )
-    parser.add_argument('file',
+    parser.add_argument('filepath',
                         help=('The file to read in.'
                               ' Should be a newline separated list.'),
                         type=str)

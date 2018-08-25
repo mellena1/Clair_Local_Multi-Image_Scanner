@@ -2,7 +2,7 @@ import os
 import sys
 
 from docker_helper import DockerHelper
-import kubernetes_helper
+from kubernetes_helper import KubernetesHelper
 from clair import Clair
 from image_scan import ImageScan
 from argparse_helper import parse_args
@@ -30,14 +30,14 @@ def main():
     docker_helper = DockerHelper(cfg['docker.connect'])
     try:
         docker_helper.ping()
-    except:
+    except Exception:
         print('Failed to connect to the docker'
               ' server specified ({}).'.format(cfg['docker.connect']))
         return 1
     clair_obj = Clair(cfg, docker_helper.docker_cli)
     try:
         clair_obj.ping()
-    except:
+    except Exception:
         print('Failed to connect to the clair'
               ' server specified ({}).'.format(cfg['clair.host']))
         return 1
@@ -50,24 +50,30 @@ def main():
             docker_server = DockerHelper(args.docker_server)
             try:
                 docker_server.ping()
-            except:
+            except Exception:
                 print('Failed to connect to the docker'
                       ' server specified ({}).'.format(args.docker_server))
                 return 1
             images = docker_server.get_container_images()
     elif args.source == 'k8s' or args.source == 'kubernetes':
         try:
-            kubernetes_helper.ping()
-        except:
-            print('\nFailed to connect to kubernetes cluster.')
+            k8s_helper = KubernetesHelper()
+        except Exception as ex:
             return 1
-        images = kubernetes_helper.get_pod_images(docker_helper)
+        try:
+            k8s_helper.ping()
+        except Exception:
+            print('\nFailed to connect to kubernetes cluster: "{}".'.format(
+                        k8s_helper.host))
+            return 1
+        images = k8s_helper.get_pod_images(docker_helper)
     elif args.source == 'file':
         # If specifying file, make sure it exists
-        if not os.path.exists(args.file):
-            print('{} does not exist!!!'.format(args.file))
+        fullpath = os.path.expanduser(args.filepath)
+        if not os.path.exists(fullpath):
+            print('{} does not exist!!!'.format(args.filepath))
             sys.exit(1)
-        images = images_from_file(args.file, docker_helper)
+        images = images_from_file(fullpath, docker_helper)
 
     # Scan all images  {name:ImageScan}
     scanned_images = {}
